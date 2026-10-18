@@ -31,11 +31,19 @@ Referencia conceptual: [NASA Glenn, Flight of a Water Rocket](https://www1.grc.n
 
 `ModelChecks.java` ejecuta pruebas numéricas independientes: casos sin presión o sin agua, límites de los controles, orden de las fases, contacto con el suelo, sensibilidad a la presión y convergencia al reducir el paso temporal. Configuración inicial: aproximadamente 28,66 m de altura y 5,25 s de vuelo.
 
-`SmokeInstrumentation.java` contiene pruebas para un dispositivo Android: apertura, controles, caso sin presión, actualización del volumen de agua y ausencia de permisos. Su ejecución necesita un teléfono o emulador; no debe considerarse aprobada hasta ejecutarla.
+`SmokeInstrumentation.java` comprueba apertura, cinco controles, caso sin presión, actualización del volumen de agua, recuperación de los resultados iniciales y ausencia de permisos. `tools/check_on_device.py` instala el APK de instrumentación, abre la app mediante ADB, ejecuta las comprobaciones y guarda el informe y una captura de la app. Después restaura los ajustes guardados y retira el componente temporal de pruebas. Requiere Python 3, un teléfono conectado y desbloqueado y una instalación de depuración de AquaVuelo que ya haya guardado sus ajustes.
+
+Compilar `assembleDebugAndroidTest` y ejecutar desde la raíz del proyecto:
+
+```text
+python tools/check_on_device.py --adb RUTA_AL_ADB --test-apk RUTA_AL_APK_DE_INSTRUMENTACION --output RUTA_DE_RESULTADOS
+```
+
+El APK de instrumentación debe estar firmado con el mismo certificado de depuración que la app instalada. No es necesario ni adecuado usar la clave de publicación para estas pruebas. El arranque mediante ADB evita el inicio desde segundo plano que el teléfono Xiaomi cancelaba durante la instrumentación.
 
 Validación local del 17 de octubre de 2026: APK de prueba, APK de instrumentación y AAB sin firma compilados. Pruebas numéricas aprobadas. Android Lint sin errores, con una advertencia sobre las reglas de transferencia de datos de Android 12; la app declara `allowBackup=false`. Instalación y apertura confirmadas en un teléfono Xiaomi con Android 14 (API 34); la captura compartida por el usuario muestra la pantalla principal y la gráfica.
 
-La prueba automática en el teléfono sigue pendiente: el primer intento detectó una suposición incorrecta del test sobre los ajustes guardados. Se corrigió la preparación de esos valores, pero el segundo intento excedió el tiempo de espera. No se considera aprobado. Se restauraron los ajustes del usuario y se retiró el componente temporal de pruebas.
+Prueba automática aprobada en el mismo teléfono: apertura, cinco controles, presión cero, actualización cruzada del volumen, resultados iniciales y ausencia de permisos. Se revisó la captura generada de la pantalla principal. Los ajustes del usuario se restauraron y el componente temporal de pruebas se retiró. Este resultado no cubre todos los dispositivos Android ni sustituye las comprobaciones de Google Play.
 
 ## Skill del proyecto
 
